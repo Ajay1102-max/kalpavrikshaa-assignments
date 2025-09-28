@@ -1,0 +1,27 @@
+# Testcase 1: Valid expression with precedence
+Input: 3 + 5 * 2
+Output: 13
+
+# Testcase 2: Expression with spaces
+Input: 10 - 2 * 3
+Output: 4
+
+# Testcase 3: Division
+Input: 20 / 4 + 6
+Output: 11
+
+# Testcase 4: Division by zero
+Input: 5 / 0
+Output: Error: Division by zero.
+
+# Testcase 5: Invalid characters
+Input: 3 + a * 2
+Output: Error: Invalid expression.
+
+# Testcase 6: Negative numbers
+Input: -5 + 3
+Output: -2
+
+# Testcase 7: Complex expression
+Input: 100 / 5 - 2 * 3 + 8
+Output: 25

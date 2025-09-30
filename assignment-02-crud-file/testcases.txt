@@ -1,0 +1,49 @@
+# Assignment 2 – CRUD Operations
+
+Testcase 1: Create Users
+Input:
+1
+101
+Ajay
+22
+1
+102
+Neha
+25
+2
+Output:
+User added successfully.
+User added successfully.
+--- User Records ---
+ID: 101, Name: Ajay, Age: 22
+ID: 102, Name: Neha, Age: 25
+
+Testcase 2: Update User
+Input:
+3
+101
+Amit
+23
+2
+Output:
+User updated successfully.
+--- User Records ---
+ID: 101, Name: Amit, Age: 23
+ID: 102, Name: Neha, Age: 25
+
+Testcase 3: Delete User
+Input:
+4
+102
+2
+Output:
+User deleted successfully.
+--- User Records ---
+ID: 101, Name: Amit, Age: 23
+
+Testcase 4: Delete Non-existent User
+Input:
+4
+999
+Output:
+User with ID 999 not found.

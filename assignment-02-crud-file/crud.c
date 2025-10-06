@@ -10,8 +10,24 @@ struct User {
     int age;
 };
 
+// Check if ID already exists in file
+int idExists(int id) {
+    struct User user;
+    FILE *file = fopen(FILENAME, "r");
+    if (!file) return 0; // file not found = no IDs yet
+
+    while (fscanf(file, "%d %s %d", &user.id, user.name, &user.age) == 3) {
+        if (user.id == id) {
+            fclose(file);
+            return 1; // found
+        }
+    }
+    fclose(file);
+    return 0; // not found
+}
+
 // Function to create (add) a new user
-void createUser() {
+void addUser() {
     struct User user;
     FILE *file = fopen(FILENAME, "a");
     if (!file) {
@@ -21,10 +37,26 @@ void createUser() {
 
     printf("Enter ID: ");
     scanf("%d", &user.id);
+
+    // Check unique ID
+    if (idExists(user.id)) {
+        printf("Error: User with ID %d already exists.\n", user.id);
+        fclose(file);
+        return;
+    }
+
     printf("Enter Name: ");
     scanf("%s", user.name);
+
     printf("Enter Age: ");
     scanf("%d", &user.age);
+
+    // Check non-negative age
+    if (user.age < 0) {
+        printf("Error: Age cannot be negative.\n");
+        fclose(file);
+        return;
+    }
 
     fprintf(file, "%d %s %d\n", user.id, user.name, user.age);
     fclose(file);
@@ -33,7 +65,7 @@ void createUser() {
 }
 
 // Function to read (display) all users
-void readUsers() {
+void displayUsers() {
     struct User user;
     FILE *file = fopen(FILENAME, "r");
     if (!file) {
@@ -49,7 +81,7 @@ void readUsers() {
 }
 
 // Function to update a user by ID
-void updateUser() {
+void modifyUserById() {
     struct User user;
     int id, found = 0;
 
@@ -69,6 +101,15 @@ void updateUser() {
             scanf("%s", user.name);
             printf("Enter new Age: ");
             scanf("%d", &user.age);
+
+            if (user.age < 0) {
+                printf("Error: Age cannot be negative.\n");
+                fclose(file);
+                fclose(temp);
+                remove("temp.txt");
+                return;
+            }
+
             found = 1;
         }
         fprintf(temp, "%d %s %d\n", user.id, user.name, user.age);
@@ -88,7 +129,7 @@ void updateUser() {
 }
 
 // Function to delete a user by ID
-void deleteUser() {
+void deleteUserById() {
     struct User user;
     int id, found = 0;
 
@@ -128,19 +169,19 @@ int main() {
 
     while (1) {
         printf("\n--- CRUD Operations Menu ---\n");
-        printf("1. Create User\n");
-        printf("2. Read Users\n");
-        printf("3. Update User\n");
-        printf("4. Delete User\n");
+        printf("1. Add User\n");
+        printf("2. Display Users\n");
+        printf("3. Modify User By ID\n");
+        printf("4. Delete User By ID\n");
         printf("5. Exit\n");
         printf("Enter your choice: ");
         scanf("%d", &choice);
 
         switch (choice) {
-            case 1: createUser(); break;
-            case 2: readUsers(); break;
-            case 3: updateUser(); break;
-            case 4: deleteUser(); break;
+            case 1: addUser(); break;
+            case 2: displayUsers(); break;
+            case 3: modifyUserById(); break;
+            case 4: deleteUserById(); break;
             case 5: exit(0);
             default: printf("Invalid choice! Try again.\n");
         }

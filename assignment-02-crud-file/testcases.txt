@@ -1,0 +1,71 @@
+# Assignment 2 – CRUD Operations (Enhanced with Validations)
+
+Testcase 1: Add Users with valid details
+Input:
+1
+101
+Ajay
+22
+1
+102
+Neha
+25
+2
+5
+Output:
+User added successfully.
+User added successfully.
+--- User Records ---
+ID: 101, Name: Ajay, Age: 22
+ID: 102, Name: Neha, Age: 25
+
+Testcase 2: Attempt to add duplicate ID
+Input:
+1
+101
+Rohan
+30
+Output:
+Error: User with ID 101 already exists.
+
+Testcase 3: Attempt to add user with negative age
+Input:
+1
+103
+Sita
+-5
+Output:
+Error: Age cannot be negative.
+
+Testcase 4: Update User by ID
+Input:
+3
+101
+Amit
+23
+2
+5
+Output:
+User updated successfully.
+--- User Records ---
+ID: 101, Name: Amit, Age: 23
+ID: 102, Name: Neha, Age: 25
+
+Testcase 5: Delete User by ID
+Input:
+4
+102
+2
+5
+Output:
+User deleted successfully.
+--- User Records ---
+ID: 101, Name: Amit, Age: 23
+
+Testcase 6: Attempt to delete non-existent user
+Input:
+4
+999
+5
+Output:
+User with ID 999 not found.

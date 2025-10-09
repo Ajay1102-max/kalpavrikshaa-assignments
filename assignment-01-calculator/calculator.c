@@ -2,110 +2,168 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <string.h>
+#include <limits.h>
 
-// Forward declarations
-int parseExpression(const char **str);
-int parseTerm(const char **str);
-int parseFactor(const char **str);
+#define MAX_INPUT_SIZE 235  // Global constant for input size
 
-// Skip whitespaces
-void skipSpaces(const char **str) {
-    while (**str == ' ') (*str)++;
+// Function prototypes
+int evaluateExpression(const char *expr, int *error);
+int parseTerm(const char **expr, int *error);
+int parseFactor(const char **expr, int *error);
+int safeMultiply(int a, int b, int *error);
+int safeAdd(int a, int b, int *error);
+
+// Function to skip spaces
+void skipSpaces(const char **expr) {
+    while (**expr == ' ') (*expr)++;
 }
 
-// Parse integer numbers
-int parseNumber(const char **str) {
-    skipSpaces(str);
-    int num = 0;
+// Handle safe addition with overflow check
+int safeAdd(int a, int b, int *error) {
+    if ((b > 0 && a > INT_MAX - b) || (b < 0 && a < INT_MIN - b)) {
+        printf("Error: Integer overflow.\n");
+        *error = 1;
+        return 0;
+    }
+    return a + b;
+}
+
+// Handle safe multiplication with overflow check
+int safeMultiply(int a, int b, int *error) {
+    if (a != 0 && (b > INT_MAX / a || b < INT_MIN / a)) {
+        printf("Error: Integer overflow.\n");
+        *error = 1;
+        return 0;
+    }
+    return a * b;
+}
+
+// Parse a factor (integer number)
+int parseFactor(const char **expr, int *error) {
+    skipSpaces(expr);
     int sign = 1;
 
-    if (**str == '-') {
+    if (**expr == '+') (*expr)++;
+    else if (**expr == '-') {
         sign = -1;
-        (*str)++;
+        (*expr)++;
     }
 
-    if (!isdigit(**str)) {
+    skipSpaces(expr);
+
+    if (!isdigit(**expr)) {
         printf("Error: Invalid expression.\n");
-        exit(1);
+        *error = 1;
+        return 0;
     }
 
-    while (isdigit(**str)) {
-        num = num * 10 + (**str - '0');
-        (*str)++;
+    int num = 0;
+    while (isdigit(**expr)) {
+        int digit = **expr - '0';
+        if (num > (INT_MAX - digit) / 10) {
+            printf("Error: Integer overflow.\n");
+            *error = 1;
+            return 0;
+        }
+        num = num * 10 + digit;
+        (*expr)++;
     }
 
     return sign * num;
 }
 
-// Parse factors (numbers only here)
-int parseFactor(const char **str) {
-    return parseNumber(str);
-}
-
-// Parse terms (multiplication/division)
-int parseTerm(const char **str) {
-    int value = parseFactor(str);
+// Parse multiplication/division
+int parseTerm(const char **expr, int *error) {
+    int value = parseFactor(expr, error);
+    if (*error) return 0;
 
     while (1) {
-        skipSpaces(str);
-        if (**str == '*') {
-            (*str)++;
-            value *= parseFactor(str);
-        } else if (**str == '/') {
-            (*str)++;
-            int divisor = parseFactor(str);
-            if (divisor == 0) {
+        skipSpaces(expr);
+        char op = **expr;
+        if (op != '*' && op != '/') break;
+        (*expr)++;
+
+        int next = parseFactor(expr, error);
+        if (*error) return 0;
+
+        if (op == '*') value = safeMultiply(value, next, error);
+        else {
+            if (next == 0) {
                 printf("Error: Division by zero.\n");
-                exit(1);
+                *error = 1;
+                return 0;
             }
-            value /= divisor;
-        } else {
-            break;
+            value /= next;
         }
     }
     return value;
 }
 
-// Parse expressions (addition/subtraction)
-int parseExpression(const char **str) {
-    int value = parseTerm(str);
+// Parse addition/subtraction
+int evaluateExpression(const char *expr, int *error) {
+    const char *p = expr;
+    int value = parseTerm(&p, error);
+    if (*error) return 0;
+
+    int hasOperator = 0; // Track if expression has any +, -, *, /
 
     while (1) {
-        skipSpaces(str);
-        if (**str == '+') {
-            (*str)++;
-            value += parseTerm(str);
-        } else if (**str == '-') {
-            (*str)++;
-            value -= parseTerm(str);
-        } else {
-            break;
+        skipSpaces(&p);
+        char op = *p;
+        if (op != '+' && op != '-') break;
+
+        hasOperator = 1; // Found operator
+
+        p++;
+
+        skipSpaces(&p);
+
+        // Reject double operators like ++ or --
+        if (*p == '+' || *p == '-') {
+            printf("Error: Invalid consecutive operators.\n");
+            *error = 1;
+            return 0;
         }
+
+        int next = parseTerm(&p, error);
+        if (*error) return 0;
+
+        if (op == '+') value = safeAdd(value, next, error);
+        else value = safeAdd(value, -next, error);
     }
+
+    skipSpaces(&p);
+    if (*p != '\0') {
+        printf("Error: Invalid trailing characters.\n");
+        *error = 1;
+        return 0;
+    }
+
+    // Expression should contain at least one operator
+    if (!hasOperator) {
+        printf("Error: Invalid expression (no operator found).\n");
+        *error = 1;
+        return 0;
+    }
+
     return value;
 }
 
 int main() {
-    char input[256];
+    char expr[MAX_INPUT_SIZE];
 
-    // Read input expression
-    if (!fgets(input, sizeof(input), stdin)) {
-        printf("Error: Invalid input.\n");
-        return 1;
+    printf("Enter expression: ");
+    fgets(expr, sizeof(expr), stdin);
+
+    // Remove newline character
+    expr[strcspn(expr, "\n")] = '\0';
+
+    int error = 0;
+    int result = evaluateExpression(expr, &error);
+
+    if (!error) {
+        printf("Result: %d\n", result);
     }
 
-    // Remove newline if present
-    input[strcspn(input, "\n")] = 0;
-
-    const char *expr = input;
-    int result = parseExpression(&expr);
-
-    skipSpaces(&expr);
-    if (*expr != '\0') { // if anything left unparsed
-        printf("Error: Invalid expression.\n");
-        return 1;
-    }
-
-    printf("%d\n", result);
     return 0;
 }

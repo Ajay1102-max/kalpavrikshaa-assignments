@@ -1,27 +1,46 @@
-# Testcase 1: Valid expression with precedence
+# Assignment 01 – Calculator Program Test Cases
+
+Valid Expressions:
+------------------
 Input: 3 + 5 * 2
-Output: 13
+Expected Output: 13
 
-# Testcase 2: Expression with spaces
-Input: 10 - 2 * 3
-Output: 4
+Input: (3 + 5) * 2   [If parentheses not supported, should print error]
+Expected Output: Error: Invalid expression.
 
-# Testcase 3: Division
-Input: 20 / 4 + 6
-Output: 11
+Input: 8 / 2 + 3
+Expected Output: 7
 
-# Testcase 4: Division by zero
+Input: 20 - 5 * 3
+Expected Output: 5
+
+Input: 15 / 3 / 5
+Expected Output: 1
+
+Invalid Expressions (Should Fail):
+---------------------------------
+Input: 2--2
+Expected Output: Error: Invalid consecutive operators.
+
+Input: 2++2
+Expected Output: Error: Invalid consecutive operators.
+
+Input: 1
+Expected Output: Error: Invalid expression (no operator found).
+
+Input: -1
+Expected Output: Error: Invalid expression (no operator found).
+
+Input: 3 + a
+Expected Output: Error: Invalid expression.
+
 Input: 5 / 0
-Output: Error: Division by zero.
+Expected Output: Error: Division by zero.
 
-# Testcase 5: Invalid characters
-Input: 3 + a * 2
-Output: Error: Invalid expression.
+Overflow Scenarios:
+-------------------
+Input: 999999999 * 999999999
+Expected Output: Error: Integer overflow.
 
-# Testcase 6: Negative numbers
-Input: -5 + 3
-Output: -2
-
-# Testcase 7: Complex expression
-Input: 100 / 5 - 2 * 3 + 8
-Output: 25
+Input: 2147483647 + 1
+Expected Output: Error: Integer overflow.

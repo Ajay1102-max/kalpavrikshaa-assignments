@@ -1,70 +1,127 @@
 #include <stdio.h>
 
-// Structure to store student details
+#define MAX_STUDENTS 100
+
+enum Grade { A, B, C, D, F };
+
 struct Student {
     int rollNumber;
     char name[50];
     float marks1, marks2, marks3;
     float total;
     float average;
-    char grade;
+    enum Grade grade;
 };
 
-// Function prototypes
-float calculateTotal(float m1, float m2, float m3);
-float calculateAverage(float total);
-char calculateGrade(float average);
-void displayPerformancePattern(char grade);
-void printRollNumbersRecursively(struct Student students[], int index, int n);
+int getStarCountForGrade(enum Grade grade) {
+    switch (grade) {
+        case A: return 5;
+        case B: return 4;
+        case C: return 3;
+        case D: return 2;
+        default: return 0;
+    }
+}
 
-// Function to calculate total marks
 float calculateTotal(float m1, float m2, float m3) {
     return m1 + m2 + m3;
 }
 
-// Function to calculate average marks
 float calculateAverage(float total) {
-    return total / 3.0;
+    return total / 3.0f;
 }
 
-// Function to assign grade based on average
-char calculateGrade(float average) {
+enum Grade calculateGrade(float average) {
     if (average >= 85)
-        return 'A';
+        return A;
     else if (average >= 70)
-        return 'B';
+        return B;
     else if (average >= 50)
-        return 'C';
+        return C;
     else if (average >= 35)
-        return 'D';
+        return D;
     else
-        return 'F';
+        return F;
 }
 
-// Function to display performance pattern (stars)
-void displayPerformancePattern(char grade) {
-    int stars = 0;
-
-    switch (grade) {
-        case 'A': stars = 5; break;
-        case 'B': stars = 4; break;
-        case 'C': stars = 3; break;
-        case 'D': stars = 2; break;
-        default: stars = 0;
-    }
-
-    if (grade == 'F') {
-        return; // Skip printing for failed students
-    }
+void displayPerformancePattern(enum Grade grade) {
+    if (grade == F)
+        return;
 
     printf("Performance: ");
-    for (int i = 0; i < stars; i++) {
+    for (int i = 0; i < getStarCountForGrade(grade); i++) {
         printf("*");
     }
     printf("\n");
 }
 
-// Recursive function to print roll numbers
+int isDuplicateRoll(struct Student students[], int count, int roll) {
+    for (int i = 0; i < count; i++) {
+        if (students[i].rollNumber == roll)
+            return 1;
+    }
+    return 0;
+}
+
+void inputStudents(struct Student students[], int *n) {
+    printf("Enter number of students: ");
+    scanf("%d", n);
+
+    for (int i = 0; i < *n; i++) {
+        while (1) {
+            printf("Enter Roll, Name, and 3 subject marks for student %d: ", i + 1);
+            scanf("%d %s %f %f %f",
+                  &students[i].rollNumber,
+                  students[i].name,
+                  &students[i].marks1,
+                  &students[i].marks2,
+                  &students[i].marks3);
+
+            if (isDuplicateRoll(students, i, students[i].rollNumber)) {
+                printf("Duplicate roll number! Please re-enter.\n");
+                continue;
+            }
+
+            if ((students[i].marks1 < 0 || students[i].marks1 > 100) ||
+                (students[i].marks2 < 0 || students[i].marks2 > 100) ||
+                (students[i].marks3 < 0 || students[i].marks3 > 100)) {
+                printf("Invalid marks! Marks must be between 0 and 100.\n");
+                continue;
+            }
+
+            students[i].total = calculateTotal(students[i].marks1, students[i].marks2, students[i].marks3);
+            students[i].average = calculateAverage(students[i].total);
+            students[i].grade = calculateGrade(students[i].average);
+            break;
+        }
+    }
+}
+
+void displayResults(struct Student students[], int n) {
+    for (int i = 0; i < n; i++) {
+        printf("Roll: %d\n", students[i].rollNumber);
+        printf("Name: %s\n", students[i].name);
+        printf("Total: %.0f\n", students[i].total);
+        printf("Average: %.2f\n", students[i].average);
+
+        char gradeChar;
+        switch (students[i].grade) {
+            case A: gradeChar = 'A'; break;
+            case B: gradeChar = 'B'; break;
+            case C: gradeChar = 'C'; break;
+            case D: gradeChar = 'D'; break;
+            default: gradeChar = 'F';
+        }
+
+        printf("Grade: %c\n", gradeChar);
+
+        if (students[i].grade != F)
+            displayPerformancePattern(students[i].grade);
+
+        printf("\n");
+    }
+}
+
 void printRollNumbersRecursively(struct Student students[], int index, int n) {
     if (index == n)
         return;
@@ -73,57 +130,12 @@ void printRollNumbersRecursively(struct Student students[], int index, int n) {
 }
 
 int main() {
+    struct Student students[MAX_STUDENTS];
     int n;
-    struct Student students[100];
 
-    printf("Enter number of students: ");
-    scanf("%d", &n);
-
-    // Input student details
-    for (int i = 0; i < n; i++) {
-        while (1) {
-            printf("\nEnter Roll, Name, and 3 subject marks for student %d: ", i + 1);
-            scanf("%d %s %f %f %f", 
-                  &students[i].rollNumber, 
-                  students[i].name, 
-                  &students[i].marks1, 
-                  &students[i].marks2, 
-                  &students[i].marks3);
-
-            // Check marks range
-            if ((students[i].marks1 < 0 || students[i].marks1 > 100) ||
-                (students[i].marks2 < 0 || students[i].marks2 > 100) ||
-                (students[i].marks3 < 0 || students[i].marks3 > 100)) {
-                printf("Invalid marks entered! Each mark must be between 0 and 100.\n");
-                printf("Please re-enter details for this student.\n");
-                continue;  // ask again for this student
-            }
-            break;  // valid input, exit loop
-        }
-
-        students[i].total = calculateTotal(students[i].marks1, students[i].marks2, students[i].marks3);
-        students[i].average = calculateAverage(students[i].total);
-        students[i].grade = calculateGrade(students[i].average);
-    }
-
+    inputStudents(students, &n);
     printf("\n");
-
-    // Display student performance
-    for (int i = 0; i < n; i++) {
-        printf("Roll: %d\n", students[i].rollNumber);
-        printf("Name: %s\n", students[i].name);
-        printf("Total: %.0f\n", students[i].total);
-        printf("Average: %.2f\n", students[i].average);
-        printf("Grade: %c\n", students[i].grade);
-
-        if (students[i].grade != 'F') {
-            displayPerformancePattern(students[i].grade);
-        }
-
-        printf("\n");
-    }
-
-    // Print roll numbers using recursion
+    displayResults(students, n);
     printf("List of Roll Numbers (via recursion): ");
     printRollNumbersRecursively(students, 0, n);
     printf("\n");

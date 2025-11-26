@@ -1,0 +1,87 @@
+# -------------------------
+# TEST CASE 1: Basic Commands
+# -------------------------
+df
+ls
+mkdir docs
+ls
+cd docs
+create notes.txt
+write notes.txt "Hello Kalpavriksha"
+read notes.txt
+delete notes.txt
+ls
+cd ..
+rmdir docs
+ls
+df
+exit
+
+# -------------------------
+# TEST CASE 2: Directory and File Creation
+# -------------------------
+mkdir test
+cd test
+create file1.txt
+write file1.txt "File system simulation"
+read file1.txt
+create file2.txt
+write file2.txt "C language structures"
+read file2.txt
+ls
+pwd
+cd ..
+ls
+rmdir test
+df
+exit
+
+# -------------------------
+# TEST CASE 3: Multiple Directory Levels
+# -------------------------
+mkdir folder1
+cd folder1
+mkdir subfolder1
+cd subfolder1
+create data.txt
+write data.txt "Nested directory test"
+read data.txt
+pwd
+cd ..
+cd ..
+ls
+df
+exit
+
+# -------------------------
+# TEST CASE 4: Error Handling
+# -------------------------
+mkdir folder2
+mkdir folder2          # duplicate directory
+cd folder3             # non-existing directory
+create report.txt
+write report.txt "This will be deleted"
+read report.txt
+delete report.txt
+delete report.txt      # deleting again
+rmdir folder3          # removing non-existing directory
+rmdir folder2
+rmdir folder2          # removing again
+exit
+
+# -------------------------
+# TEST CASE 5: Disk Usage and Empty Directories
+# -------------------------
+df
+mkdir music
+cd music
+create song.txt
+write song.txt "Audio data"
+read song.txt
+df
+delete song.txt
+df
+cd ..
+rmdir music
+df
+exit

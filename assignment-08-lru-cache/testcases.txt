@@ -1,0 +1,23 @@
+createCache 5
+put 101 token_A12
+put 102 token_B93
+put 103 token_C44
+get 101
+put 104 token_D11
+put 105 token_E77
+get 102
+put 106 token_F88
+get 103
+get 104
+get 101
+put 107 token_G29
+get 105
+get 106
+get 107
+put 108 token_H55
+put 109 token_J33
+get 104
+get 106
+get 108
+get 110
+exit
